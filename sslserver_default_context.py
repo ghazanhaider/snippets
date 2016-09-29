@@ -1,9 +1,10 @@
-# Simplest SSL connection
+# Using ssl.create_default_context does something that fails
+# our connections looking for CA file. It only works if we 
+# remove Purpose.SERVER_AUTH and add load_verify_locations:
 
 import socket,ssl
-context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH )
 context.load_cert_chain(certfile="./cert.pem")
-context.options &= ~ssl.OP_NO_SSLv3
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sslsock = context.wrap_socket(s)
 sslsock.bind(('',8011))
