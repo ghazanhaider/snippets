@@ -4,7 +4,7 @@ Snippets
 Basic snippets:
 
 * server.py and client.py are basic sockets client and server (fixed message size of 1024)
-* sslserver.py and sslclient.py are basic SSL sockets, fixed message size (no host validation)
+* sslserver.py and sslclient.py are basic SSL sockets, fixed message size, ssl client and server auth. Separate certificates will have to be created when these apps run on different hosts.
 * The default_context pair use ssl.create_default_context but have specific requirements to make them work.
 
 
@@ -26,3 +26,7 @@ Server testing:
 Server www testing:
 
 `openssl s_server -cert ./cert.pem -www`
+
+Much more detailed client side testing:
+
+`openssl s_client -connect dev.ghazan.work:8011 -cert ./dev.cert.pem -key ./dev.ghazan.work.key.pem  -CAfile ./ca-chain.cert.pem -state  -debug -tls1 -servername dev.ghazan.work -verify 10`
