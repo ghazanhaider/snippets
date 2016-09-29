@@ -5,6 +5,7 @@ Basic snippets:
 
 * server.py and client.py are basic sockets client and server (fixed message size of 1024)
 * sslserver.py and sslclient.py are basic SSL sockets, fixed message size, ssl client and server auth. Separate certificates will have to be created when these apps run on different hosts.
+* sslserver_context.py and sslclient_context.py are similar but use SSLContext which is supposed to be easier(?) and preferred.
 * The default_context pair use ssl.create_default_context but have specific requirements to make them work.
 
 

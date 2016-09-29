@@ -1,14 +1,13 @@
-# Simplest SSL connection
-
+# Simple non-context SSL client
 import socket,ssl
-context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-context.load_cert_chain(certfile="./dev.cert.pem",keyfile="./dev.ghazan.work.key.pem")
-context.load_verify_locations(cafile="./ca-chain.cert.pem")
-context.verify_mode = ssl.CERT_REQUIRED
-context.check_hostname = True
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sslsock = context.wrap_socket(s,server_hostname="dev.ghazan.work")
-sslsock.connect(('dev.ghazan.work',8012))
+sslsock = ssl.wrap_socket(s,
+    keyfile="./dev.ghazan.work.key.pem",
+    certfile="./dev.cert.pem",
+    ca_certs="./ca-chain.cert.pem",
+    cert_reqs=ssl.CERT_REQUIRED,
+    ssl_version=ssl.PROTOCOL_TLSv1)
+sslsock.connect(('dev.ghazan.work',8011))
 sslsock.send('i am client')
 data = sslsock.recv(1024)
 sslsock.close()

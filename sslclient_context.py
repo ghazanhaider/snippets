@@ -1,9 +1,8 @@
-# Using ssl.create_default_context
+# SSL client with SSLContext
 
 import socket,ssl
-context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH )
+context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
 context.load_cert_chain(certfile="./dev.cert.pem",keyfile="./dev.ghazan.work.key.pem")
-
 context.load_verify_locations(cafile="./ca-chain.cert.pem")
 context.verify_mode = ssl.CERT_REQUIRED
 context.check_hostname = True
