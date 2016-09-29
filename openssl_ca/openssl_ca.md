@@ -1,6 +1,27 @@
 Creating a local CA and self-signed certs
 =========================================
 
+A CA should be used to generate certs instead of single-shot self-signed certs without a CA, because without host verification you're only ensuring data integrity through ecryption after the connection is up. Host verification requires CA-signed certificates and the CA-chain file as well.
+
+To make sure the server app also requires certs from the client, this option should be enabled on both sides:
+`context.verify_mode = ssl.CERT_REQUIRED`
+
+The cert which will otherwise work, will fail with the above option on the server silently because the extension should include both **client** and **server**. It is easier to create a new extension section (called **app_cert** here) and reference it during cert generation.
+
+New extension section in the ./intermediate/openssl.cnf file:
+```
+[ app_cert ]
+# Extesion for a client + server cert
+basicConstraints = CA:FALSE
+nsCertType = server, client, email
+nsComment = "OpenSSL Generated Server and Client Certificate"
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer:always
+keyUsage = critical, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth, clientAuth, emailProtection
+```
+
+
 Create a local CA using OpenSSL:
 
 ```
@@ -62,7 +83,7 @@ Private key and CSR:
 openssl genrsa -out intermediate/private/dev.ghazan.work.key.pem 2048
 chmod 400 intermediate/private/dev.ghazan.work.key.pem 
 openssl req -config intermediate/openssl.cnf -key intermediate/private/dev.ghazan.work.key.pem -new -sha256 -out intermediate/private/dev.ghazan.work.csr.pem
-openssl ca -config intermediate/openssl.cnf -extensions server_cert -days 6000 -notext -md sha256 -in intermediate/private/dev.ghazan.work.csr.pem -out intermediate/private/dev.ghazan.work.cert.pem
+openssl ca -config intermediate/openssl.cnf -extensions app_cert -days 6000 -notext -md sha256 -in intermediate/private/dev.ghazan.work.csr.pem -out intermediate/private/dev.ghazan.work.cert.pem
 chmod 444 intermediate/private/dev.ghazan.work.cert.pem 
 ```
 

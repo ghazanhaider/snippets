@@ -119,6 +119,16 @@ authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = serverAuth
 
+[ app_cert ]
+# Extesion for a client + server cert
+basicConstraints = CA:FALSE
+nsCertType = server, client, email
+nsComment = "OpenSSL Generated Server and Client Certificate"
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer:always
+keyUsage = critical, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth, clientAuth, emailProtection
+
 [ crl_ext ]
 # Extension for CRLs (`man x509v3_config`).
 authorityKeyIdentifier=keyid:always
