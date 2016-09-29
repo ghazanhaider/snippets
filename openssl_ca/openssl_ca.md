@@ -10,7 +10,7 @@ mkdir certs crl newcerts private
 chmod 700 private/
 touch index.txt
 echo 1000 > serial
-vi openssl.cnf     # Add root CA config file here
+cp /root/openssl_root.cnf ./openssl.cnf     # Add root CA config file here
 openssl genrsa -aes256 -out private/ca.key.pem 4096
 chmod 400 private/ca.key.pem 
 openssl req -config openssl.cnf -key private/ca.key.pem -new -x509 -days 7300 -sha256 -extensions v3_ca -out certs/ca.cert.pem
@@ -28,7 +28,7 @@ chmod 700 private
 touch index.txt
 echo 1000 > serial
 echo 1000 > crlnumber
-vi openssl.cnf     # Add Intermediate CA config file here
+cp /root/openssl_inter.cnf ./openssl.cnf     # Add Intermediate CA config file here
 cd ..
 openssl genrsa -aes256       -out intermediate/private/intermediate.key.pem 4096
 chmod 400 intermediate/private/intermediate.key.pem
