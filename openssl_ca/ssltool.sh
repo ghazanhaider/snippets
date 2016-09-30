@@ -9,11 +9,33 @@
 # -C = Client certificate (same as above)
 # -B = Both types of certificate, to be validated at both ends of the application
 
+OPENSSL_CONF=/root/snippets/openssl_ca/openssl_root.cnf
+ROOT_CA_EXPIRY=7300
+DEFAULT_COUNTRY=CA
+DEFAULT_STATE=Ontario
+DEFAULT_LOCALITY=Toronto
+DEFAULT_ORG=Unemployed # !!!!!!!!!!!! Need to fix this override with $org
 
 create_ca_main() {
+	cd $ca_path
+	pwd
+	mkdir certs crl newcerts private
+	chmod 700 private/
+	touch index.txt
+	echo 1000 > serial
+	cp $OPENSSL_CONF ./openssl.cnf     # Add root CA config file here
+	echo "Generating CA priv key"
+	openssl genrsa -aes256 -out private/ca.key.pem -passout pass:CHANGEME 4096
+	chmod 400 private/ca.key.pem
+	echo "Generating CA cert"
+	openssl req -config openssl.cnf -key private/ca.key.pem -new -x509 -days $ROOT_CA_EXPIRY -sha256 -extensions v3_ca -out certs/ca.cert.pem -passin pass:CHANGEME -subj "/C=$DEFAULT_COUNTRY/ST=$DEFAULT_STATE/L=$DEFAULT_LOCALITY/O=$DEFAULT_ORG/CN=$common_name"
+	chmod 444 certs/ca.cert.pem
 }
 
 create_cert_main() {
+	cd $ca_path
+	pwd
+	echo "making cert"
 }
 
 
