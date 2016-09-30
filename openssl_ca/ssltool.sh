@@ -10,6 +10,7 @@
 # -B = Both types of certificate, to be validated at both ends of the application
 
 OPENSSL_CONF=/root/snippets/openssl_ca/openssl_root.cnf
+OPENSSL_INTER_CONF=/root/snippets/openssl_ca/openssl_inter.cnf
 ROOT_CA_EXPIRY=7300
 DEFAULT_COUNTRY=CA
 DEFAULT_STATE=Ontario
@@ -30,6 +31,26 @@ create_ca_main() {
 	echo "Generating CA cert"
 	openssl req -config openssl.cnf -key private/ca.key.pem -new -x509 -days $ROOT_CA_EXPIRY -sha256 -extensions v3_ca -out certs/ca.cert.pem -passin pass:CHANGEME -subj "/C=$DEFAULT_COUNTRY/ST=$DEFAULT_STATE/L=$DEFAULT_LOCALITY/O=$DEFAULT_ORG/CN=$common_name"
 	chmod 444 certs/ca.cert.pem
+
+	echo "Generating Intermediate Key"
+	mkdir $ca_path/intermediate
+	cd $ca_path/intermediate
+	mkdir certs crl csr newcerts private
+	chmod 700 private
+	touch index.txt
+	echo 1000 > serial
+	echo 1000 > crlnumber
+	cp $OPENSSL_INTER_CONF ./openssl.cnf     # Add Intermediate CA config file here
+	cd ..
+	openssl genrsa -aes256 -out intermediate/private/intermediate.key.pem 4096 #-passout pass:CHANGEME 4096
+	chmod 400 intermediate/private/intermediate.key.pem
+	echo "Generating Intermediate cert request"
+	openssl req -config intermediate/openssl.cnf -new -sha256 -key intermediate/private/intermediate.key.pem -out intermediate/csr/intermediate.csr.pem -subj "/C=$DEFAULT_COUNTRY/ST=$DEFAULT_STATE/L=$DEFAULT_LOCALITY/O=$DEFAULT_ORG/CN=Intermediate"
+	# ^^ -passin pass:CHANGEME before -subj
+	echo "Signing Intermediate cert"
+	openssl ca -config openssl.cnf -extensions v3_intermediate_ca -days $ROOT_CA_EXPIRY -notext -md sha256  -in intermediate/csr/intermediate.csr.pem -out intermediate/certs/intermediate.cert.pem
+	# ^^ -passin pass:CHANGEME before -in
+	chmod 444 intermediate/certs/intermediate.cert.pem
 }
 
 create_cert_main() {
